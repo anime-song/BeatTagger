@@ -5,13 +5,18 @@
     xmlns:converter="clr-namespace:BeatTagger.WPF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:BeatTagger.WPF.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rules="clr-namespace:BeatTagger.WPF.Rules"
     d:Background="White"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
         <converter:PositionToCanvasLeftConverter x:Key="PositionToCanvasLeftConverter" />
+        <converter:TimeSignatureToStringConverter x:Key="TimeSignatureToStringConverter" />
+        <rules:BeatUnitValidationRule x:Key="BeatUnitValidationRule" />
+        <rules:BpmValidationRule x:Key="BpmValidationRule" />
     </UserControl.Resources>
     <Grid Width="{Binding Width.Value}">
         <Grid.RowDefinitions>
@@ -25,18 +30,38 @@
             d:Text="1"
             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
             Text="{Binding Index.Value}" />
-        <TextBlock Grid.Row="1">
-            <Run d:Text="4" Text="{Binding TimeSignature.Value.BeatsPerMeasure, Mode=OneWay}" />
-            <Run Text="/" />
-            <Run d:Text="4" Text="{Binding TimeSignature.Value.BeatUnit.Value, Mode=OneWay}" />
-        </TextBlock>
-        <TextBlock
+        <TextBox
+            Grid.Row="1"
+            d:Text="4/4"
+            materialDesign:ValidationAssist.OnlyShowOnFocus="True"
+            materialDesign:ValidationAssist.PopupPlacement="Bottom"
+            materialDesign:ValidationAssist.UsePopup="True">
+            <TextBox.Text>
+                <Binding Converter="{StaticResource TimeSignatureToStringConverter}" Path="TimeSignature.Value">
+                    <Binding.ValidationRules>
+                        <StaticResource ResourceKey="BeatUnitValidationRule" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <TextBox
             Grid.Row="2"
             d:Text="120"
-            Text="{Binding BPM.Value}" />
+            materialDesign:TextFieldAssist.RippleOnFocusEnabled="True"
+            materialDesign:ValidationAssist.OnlyShowOnFocus="True"
+            materialDesign:ValidationAssist.PopupPlacement="Bottom"
+            materialDesign:ValidationAssist.UsePopup="True">
+            <TextBox.Text>
+                <Binding Path="BPM.Value">
+                    <Binding.ValidationRules>
+                        <StaticResource ResourceKey="BpmValidationRule" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
 
         <Canvas x:Name="BeatCanvas" Grid.Row="3">
-            <ItemsControl d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Beats}">
+            <ItemsControl d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Beats.Value}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Rectangle

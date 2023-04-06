@@ -35,8 +35,22 @@ namespace BeatTagger.WPF.Models
 
         public int Value { get; }
 
-        private BeatUnit(int value)
+        /// <summary>
+        /// ビート単位
+        /// </summary>
+        /// <param name="value"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public BeatUnit(int value)
         {
+            if (value != 2 &&
+                value != 4 &&
+                value != 8 &&
+                value != 16 &&
+                value != 32 &&
+                value != 64)
+            {
+                throw new ArgumentException("対応していないビートの単位です");
+            }
             Value = value;
         }
     }

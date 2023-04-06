@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace BeatTagger.WPF.Converters
 {
-    public class PositionToCanvasLeftConverter : IMultiValueConverter
+    public sealed class PositionToCanvasLeftConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

@@ -27,7 +27,7 @@ namespace BeatTagger.WPF.Models
         /// <summary>
         /// ビート
         /// </summary>
-        public ReadOnlyReactiveCollection<Beat> Beats { get; }
+        public ReactiveProperty<List<Beat>> Beats { get; } = new ReactiveProperty<List<Beat>>();
 
         /// <summary>
         /// 一小節の長さ（秒）
@@ -66,9 +66,9 @@ namespace BeatTagger.WPF.Models
                 .Select(_ => BaseWidth.Value * Duration.Value)
                 .ToReadOnlyReactivePropertySlim();
 
-            Beats = Observable
+            Observable
                 .Merge(TimeSignature.PropertyChangedAsObservable(), BPM.PropertyChangedAsObservable())
-                .SelectMany(_ =>
+                .Subscribe(_ =>
                 {
                     var beats = new List<Beat>();
                     float secondsPerBeat = 60.0f / BPM.Value;
@@ -77,9 +77,8 @@ namespace BeatTagger.WPF.Models
                     {
                         beats.Add(new Beat(secondsPerBeatInBeatUnit * i));
                     }
-                    return beats;
-                })
-                .ToReadOnlyReactiveCollection();
+                    Beats.Value = beats;
+                });
         }
     }
 }
