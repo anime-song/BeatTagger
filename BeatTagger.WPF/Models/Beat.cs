@@ -7,14 +7,17 @@ namespace BeatTagger.WPF.Models
     /// </summary>
     public sealed class Beat
     {
-        /// <summary>
-        /// このビートの時間（秒）
-        /// </summary>
-        public ReactiveProperty<float> Time { get; } = new ReactiveProperty<float>();
+        public ReactiveProperty<int> Index { get; } = new ReactiveProperty<int>();
 
-        public Beat(float time)
+        /// <summary>
+        /// このビートの位置 (0 ~ 1)
+        /// </summary>
+        public ReactiveProperty<float> Position { get; } = new ReactiveProperty<float>();
+
+        public Beat(float position, int index)
         {
-            Time.Value = time;
+            Index.Value = index;
+            Position.Value = position;
         }
     }
 }

@@ -41,16 +41,16 @@ namespace BeatTagger.WPF.Models
 
         public ReactiveProperty<bool> IsChanged { get; } = new ReactiveProperty<bool>();
 
-        public ReadOnlyReactivePropertySlim<int> BaseWidth { get; }
+        public ReadOnlyReactivePropertySlim<int> WidthPerSecond { get; }
 
         public ReadOnlyReactivePropertySlim<float> Width { get; }
 
-        public Measure(int index, TimeSignature timeSignature, float bpm, ReactiveProperty<int> baseWidth)
+        public Measure(int index, TimeSignature timeSignature, float bpm, ReactiveProperty<int> widthPerSecond)
         {
             Index.Value = index;
             TimeSignature.Value = timeSignature;
             BPM.Value = bpm;
-            BaseWidth = baseWidth.ToReadOnlyReactivePropertySlim();
+            WidthPerSecond = widthPerSecond.ToReadOnlyReactivePropertySlim();
             Duration = Observable
                 .Merge(BPM.PropertyChangedAsObservable(), TimeSignature.PropertyChangedAsObservable())
                 .Select(_ =>
@@ -62,8 +62,8 @@ namespace BeatTagger.WPF.Models
                 .ToReadOnlyReactivePropertySlim();
 
             Width = Observable
-                .Merge(BaseWidth.PropertyChangedAsObservable(), Duration.PropertyChangedAsObservable())
-                .Select(_ => BaseWidth.Value * Duration.Value)
+                .Merge(WidthPerSecond.PropertyChangedAsObservable(), Duration.PropertyChangedAsObservable())
+                .Select(_ => WidthPerSecond.Value * Duration.Value)
                 .ToReadOnlyReactivePropertySlim();
 
             Observable
@@ -75,10 +75,42 @@ namespace BeatTagger.WPF.Models
                     float secondsPerBeatInBeatUnit = secondsPerBeat * (BeatUnit.QuaterNotes.Value / (float)TimeSignature.Value.BeatUnit.Value);
                     for (int i = 0; i < TimeSignature.Value.BeatsPerMeasure; ++i)
                     {
-                        beats.Add(new Beat(secondsPerBeatInBeatUnit * i));
+                        beats.Add(new Beat(secondsPerBeatInBeatUnit * i / Duration.Value, i + 1));
                     }
-                    Beats.Value = beats;
+                    Beats.Value = beats
+                        .OrderBy(x => x.Index.Value)
+                        .ToList();
                 });
+        }
+
+        /// <summary>
+        /// 指定したビートの前のビートを取得します。
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public Beat? GetPreviousBeat(Beat beat)
+        {
+            if (beat.Index.Value == 1)
+            {
+                return null;
+            }
+
+            return Beats.Value[beat.Index.Value - 2];
+        }
+
+        /// <summary>
+        /// 指定したビートの次のビートを取得します。
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public Beat? GetNextBeat(Beat beat)
+        {
+            if (beat.Index.Value == Beats.Value.Count)
+            {
+                return null;
+            }
+
+            return Beats.Value[beat.Index.Value];
         }
     }
 }

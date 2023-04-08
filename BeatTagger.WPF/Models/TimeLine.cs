@@ -13,7 +13,7 @@ namespace BeatTagger.WPF.Models
     public sealed class TimeLine
     {
         public ReactiveCollection<Measure> Measures { get; } = new ReactiveCollection<Measure>();
-        public ReactiveProperty<int> BaseWidth { get; } = new ReactiveProperty<int>(100);
+        public ReactiveProperty<int> WidthPerSecond { get; } = new ReactiveProperty<int>(100);
 
         private int index = 1;
 
@@ -23,7 +23,7 @@ namespace BeatTagger.WPF.Models
 
         public void AddMeasure(TimeSignature timeSignature, float bpm)
         {
-            var measure = new Measure(index, timeSignature, bpm, BaseWidth);
+            var measure = new Measure(index, timeSignature, bpm, WidthPerSecond);
             Measures.Add(measure);
 
             index++;
