@@ -18,7 +18,7 @@
         <rules:BeatUnitValidationRule x:Key="BeatUnitValidationRule" />
         <rules:BpmValidationRule x:Key="BpmValidationRule" />
     </UserControl.Resources>
-    <Grid Width="{Binding Width.Value}">
+    <Grid x:Name="TopGrid" Width="{Binding Width.Value}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -47,7 +47,6 @@
         <TextBox
             Grid.Row="2"
             d:Text="120"
-            materialDesign:TextFieldAssist.RippleOnFocusEnabled="True"
             materialDesign:ValidationAssist.OnlyShowOnFocus="True"
             materialDesign:ValidationAssist.PopupPlacement="Bottom"
             materialDesign:ValidationAssist.UsePopup="True">
@@ -60,34 +59,45 @@
             </TextBox.Text>
         </TextBox>
 
-        <Canvas x:Name="BeatCanvas" Grid.Row="3">
-            <ItemsControl d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Beats.Value}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+        <ItemsControl
+            Grid.Row="3"
+            d:ItemsSource="{d:SampleData ItemCount=4}"
+            ItemsSource="{Binding Beats.Value}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        x:Name="BeatBorder"
+                        Width="15"
+                        Background="Transparent"
+                        MouseLeftButtonDown="BeatBorder_MouseLeftButtonDown"
+                        MouseLeftButtonUp="BeatBorder_MouseLeftButtonUp"
+                        MouseMove="BeatBorder_MouseMove">
                         <Rectangle
+                            x:Name="BeatRectangle"
                             Width="2"
                             Height="100"
                             Fill="Black" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left">
-                            <Setter.Value>
-                                <MultiBinding Converter="{StaticResource PositionToCanvasLeftConverter}">
-                                    <Binding Path="Time.Value" />
-                                    <Binding Path="DataContext.BaseWidth.Value" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}" />
-                                </MultiBinding>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </Canvas>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource PositionToCanvasLeftConverter}">
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}" />
+                                <Binding Path="Position.Value" />
+                                <Binding Path="DataContext.Width.Value" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas Width="Auto" HorizontalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
     </Grid>
 </UserControl>
