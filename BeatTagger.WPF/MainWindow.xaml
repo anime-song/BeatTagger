@@ -9,7 +9,14 @@
     Width="800"
     Height="450"
     mc:Ignorable="d">
+    <Window.InputBindings>
+        <KeyBinding Key="Space" Command="{Binding DataContext.PlayPauseAudioCommand, ElementName=audioPlayerView}" />
+    </Window.InputBindings>
     <Grid>
+        <local:AudioPlayerView
+            x:Name="audioPlayerView"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch" />
         <ItemsControl ItemsSource="{Binding TimeLine.Measures}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
